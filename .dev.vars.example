@@ -1,0 +1,14 @@
+# Copy to .dev.vars (git-ignored) and fill in only what you need. Never commit real values.
+LOCAL_DEV=1
+
+# Optional: company-name search for `npm run dev:preview` (free Tavily key; preview results are never saved).
+TAVILY_API_KEY=
+
+# Optional: HubSpot sync for `npm run dev:test`. Use a HubSpot DEVELOPER TEST account only; the app refuses other account types.
+HUBSPOT_TEST_TOKEN=
+HUBSPOT_PORTAL_ID=
+
+# Only for `npm run dev:local` (real GitHub sign-in): your own GitHub OAuth app and numeric GitHub user ID.
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+ALLOWED_GITHUB_IDS=

@@ -1,0 +1,24 @@
+# Local development configuration. The dev launchers (npm run dev:test / dev:preview / dev:local) generate a
+# local-only copy of this file, check the effective bindings, and only then start the Worker.
+name = "lightyield-local"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = false
+preview_urls = false
+
+# Workers AI runs on Cloudflare's network even in local development (it uses your own Cloudflare account).
+[ai]
+binding = "AI"
+remote = true
+
+# Local D1 database. The launcher applies the migrations in ./migrations to a disposable local copy.
+[[d1_databases]]
+binding = "DB"
+database_name = "lightyield-phase0"
+database_id = "00000000-0000-4000-8000-000000000000"
+migrations_dir = "migrations"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+run_worker_first = true
