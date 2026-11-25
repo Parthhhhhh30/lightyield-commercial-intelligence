@@ -5,7 +5,7 @@
 | Evidence | Scope | Where it ran |
 |---|---|---|
 | Offline regression | 25 stages passed, none failed or skipped: evidence checks, CRM failure handling, idempotency and isolation guards | The original private repository, commit `bc48e3c` (the code in this repository) |
-| Live browser journey | 8 of 8 checks: research, review, HubSpot sync, conversation, follow-up and accessibility, with real Workers AI and a HubSpot developer test account | An earlier commit of the same project |
+| Live browser journey | 8 of 8 checks: research, review, HubSpot sync, conversation, follow-up and accessibility, with real Workers AI and a HubSpot developer test account | The original private repository, earlier commit `abcdb3c`; not rerun on `bc48e3c` |
 | Real company research | Name-only research on several UK grower websites through the non-saving preview, reviewed by hand | Local preview; qualitative feedback only |
 | Synthetic commercial workflow | One fictional company, run by hand from research to a completed HubSpot follow-up | Local database and a HubSpot developer test account |
 
