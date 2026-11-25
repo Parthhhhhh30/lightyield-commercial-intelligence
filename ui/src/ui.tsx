@@ -31,3 +31,5 @@ export const Pill = ({ children, tone = "slate" }: { children: ReactNode; tone?:
   const t = { slate: "bg-slate-200 text-slate-800 border-slate-400", green: "bg-green-100 text-green-800 border-green-300", amber: "bg-amber-100 text-amber-900 border-amber-300", red: "bg-red-100 text-red-800 border-red-300", violet: "bg-violet-100 text-violet-800 border-violet-300", sky: "bg-sky-100 text-sky-800 border-sky-300" }[tone];
   return <span className={`inline-block rounded border px-2 py-0.5 text-xs font-medium ${t}`}>{children}</span>;
 };
+// True only in the public static demo build (vite.demo.config.ts sets mode "demo"). Vite replaces import.meta.env.MODE at build time, so demo-only branches are removed from the operational build.
+export const DEMO = import.meta.env.MODE === "demo";

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useState } from "react";
 import { api, newId } from "./api";
-import { Card, Err, Pill, inputCls, primary, ghost, btn } from "./ui";
+import { Card, Err, Pill, inputCls, primary, ghost, btn, DEMO } from "./ui";
 
 const today = () => new Date().toISOString().slice(0, 10);
 const tone = (v: string): "green" | "slate" | "amber" => (v === "Unknown" ? "slate" : "green");
@@ -67,10 +67,10 @@ export default function Account({ id, onResearch, onSyncScreen }: { id: string; 
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div><h1 className="text-xl font-bold" data-testid="acct-name">{co.name}</h1>
-          <p className="text-sm text-slate-600">{co.domain ?? "no domain recorded"} · HubSpot: {co.hubspot_id ? <a className="underline" target="_blank" rel="noreferrer" href={a.hubspot_url ?? "#"} data-testid="hs-link">record {co.hubspot_id} ↗</a> : <Pill tone="amber">not in HubSpot yet ({co.sync_status})</Pill>}</p></div>
-        <button className={ghost} onClick={onResearch}>Research again</button>
+          <p className="text-sm text-slate-600">{co.domain ?? "no domain recorded"} · {DEMO ? <>CRM (simulated): <Pill tone={co.sync_status === "synced" ? "green" : "amber"}>{co.sync_status === "synced" ? "synced" : "not synced yet"}</Pill></> : <>HubSpot: {co.hubspot_id ? <a className="underline" target="_blank" rel="noreferrer" href={a.hubspot_url ?? "#"} data-testid="hs-link">record {co.hubspot_id} ↗</a> : <Pill tone="amber">not in HubSpot yet ({co.sync_status})</Pill>}</>}</p></div>
+        <button className={ghost} onClick={onResearch}>{DEMO ? "Back to research" : "Research again"}</button>
       </div>
-      {co.sync_stale && <div role="status" data-testid="stale" className="rounded border border-amber-400 bg-amber-50 p-2 text-sm text-amber-900">HubSpot holds an <b>older version</b> of this company\u2019s approved evidence. Open the research screen and press “Sync changes to HubSpot”.</div>}
+      {co.sync_stale && <div role="status" data-testid="stale" className="rounded border border-amber-400 bg-amber-50 p-2 text-sm text-amber-900">{DEMO ? "The simulated CRM record" : "HubSpot"} holds an <b>older version</b> of this company\u2019s approved evidence. Open the research screen and press “{DEMO ? "Sync changes" : "Sync changes to HubSpot"}”.</div>}
       {(co.evidence_conflicts ?? []).length > 0 && <div role="alert" data-testid="evidence-conflict" className="rounded border border-red-400 bg-red-50 p-2 text-sm text-red-900"><b>Unresolved evidence conflict.</b> A later review of an older run disagrees with the newest run: {(co.evidence_conflicts as any[]).map((c) => `${c.kind}: “${c.winner.value}” (newest run) vs “${c.other.value}” (older run, reviewed later)`).join("; ")}. Reject or edit the older finding, or re-review the newer one. Sync is blocked until resolved.</div>}
       <Err msg={err} />
 
@@ -97,17 +97,17 @@ export default function Account({ id, onResearch, onSyncScreen }: { id: string; 
       </div>
 
       <Card title="Discovery questions" id="qs">
-        <ul className="space-y-1 text-sm" data-testid="questions">{a.questions.length === 0 && <li className="text-slate-600">No questions yet. Approve questions in research, add your own, or ask the AI to propose some.</li>}
+        <ul className="space-y-1 text-sm" data-testid="questions">{a.questions.length === 0 && <li className="text-slate-600">{DEMO ? "No questions yet. Approve questions in research or add your own." : "No questions yet. Approve questions in research, add your own, or ask the AI to propose some."}</li>}
           {a.questions.filter((x: any) => x.status !== "dropped").map((x: any) => (
             <li key={x.id} className="flex flex-wrap items-center gap-2 rounded border border-slate-200 p-2"><span className="min-w-0 flex-1">{x.text}</span>
-              <Pill tone={x.origin === "human" ? "slate" : "sky"}>{x.origin === "human" ? "yours" : "AI suggestion"}</Pill><Pill tone={x.status === "proposed" ? "amber" : x.status === "asked" ? "green" : "slate"}>{x.status}</Pill>
+              <Pill tone={x.origin === "human" ? "slate" : "sky"}>{x.origin === "human" ? "yours" : DEMO ? "suggested" : "AI suggestion"}</Pill><Pill tone={x.status === "proposed" ? "amber" : x.status === "asked" ? "green" : "slate"}>{x.status}</Pill>
               {x.status === "proposed" && <button className={ghost} onClick={() => run("q" + x.id, () => api.acceptQuestion(x.id))}>Accept</button>}
               {x.status === "open" && <button className={ghost} onClick={() => run("q" + x.id, () => api.setQuestion(x.id, "asked"))}>Mark asked</button>}
               <button className={ghost} onClick={() => run("q" + x.id, () => api.setQuestion(x.id, "dropped"))}>Drop</button></li>))}</ul>
         <form className="mt-2 flex flex-wrap gap-2" onSubmit={async (e) => { e.preventDefault(); if (q.trim()) { const r = await run("addq", () => api.addQuestion(id, q.trim())); if (r.ok) setQ(""); } }}>
           <label className="w-full min-w-0 text-sm sm:w-auto sm:flex-1">Add your own question<input aria-label="Add your own question" className={inputCls} value={q} maxLength={300} onChange={(e) => setQ(e.target.value)} /></label>
           <button className={`${primary} self-end`} disabled={!q.trim()}>Add</button>
-          <button type="button" className={`${ghost} self-end`} disabled={busy === "sug"} onClick={() => run("sug", () => api.suggest(id))}>{busy === "sug" ? "Asking AI…" : "Suggest questions (AI)"}</button>
+          {DEMO ? <p className="w-full text-xs text-slate-600" data-testid="no-ai-suggest">AI-suggested questions need a live model, so they are not part of this demo.</p> : <button type="button" className={`${ghost} self-end`} disabled={busy === "sug"} onClick={() => run("sug", () => api.suggest(id))}>{busy === "sug" ? "Asking AI…" : "Suggest questions (AI)"}</button>}
         </form>
       </Card>
 
@@ -140,9 +140,9 @@ export default function Account({ id, onResearch, onSyncScreen }: { id: string; 
         </Card>
       </div>
 
-      <Card title="Next action (HubSpot follow-up task)" id="tasks">
+      <Card title={DEMO ? "Next action (follow-up task)" : "Next action (HubSpot follow-up task)"} id="tasks">
         {!co.hubspot_id || co.sync_status !== "synced" ? <div className="rounded border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900" data-testid="needs-sync" role="status">
-            <p><b>Follow-ups are saved to HubSpot, so this company must be synced first.</b> Current state: {!co.hubspot_id ? "not yet synced (no HubSpot company)" : `sync status "${co.sync_status}"`}. Researching a company never creates a HubSpot record by itself; syncing does, and only with the findings you approved.</p>
+            {DEMO ? <p><b>Follow-ups belong to the CRM record, so sync this company first.</b> It has not been synced to the simulated CRM yet. Syncing uses only the findings you approved.</p> : <p><b>Follow-ups are saved to HubSpot, so this company must be synced first.</b> Current state: {!co.hubspot_id ? "not yet synced (no HubSpot company)" : `sync status "${co.sync_status}"`}. Researching a company never creates a HubSpot record by itself; syncing does, and only with the findings you approved.</p>}
             {a.latest_run_id ? <button className={`${primary} mt-2`} data-testid="go-sync" onClick={() => onSyncScreen(a.latest_run_id)}>Go to this company's research to review and sync</button> : <p className="mt-1">No research run found for this company: run research first.</p>}
           </div> : (
           <form className="grid gap-2 sm:grid-cols-[2fr_1fr_1fr_auto]" onSubmit={(e) => { e.preventDefault(); saveTask(); }} data-testid="task-form">
@@ -151,12 +151,12 @@ export default function Account({ id, onResearch, onSyncScreen }: { id: string; 
             <label className="text-sm">Due<input type="date" min={today()} className={inputCls} value={tk.due_on} onChange={(e) => setTk({ ...tk, due_on: e.target.value })} /></label>
             <button className={`${primary} self-end`} disabled={tkBusy || !tk.subject.trim() || !tk.owner.trim()} data-testid="create-task">{tkBusy ? "Saving…" : "Create follow-up"}</button>
           </form>)}
-        <p className="mt-1 text-xs text-slate-600">Optional limitation, not an error: the owner you type is saved as text in the task. Assigning a real HubSpot owner needs an extra API permission this key deliberately lacks. It does not block creating follow-ups.</p>
+        {DEMO ? <p className="mt-1 text-xs text-slate-600">In this demo, follow-ups are stored in your browser and their CRM status is simulated.</p> : <p className="mt-1 text-xs text-slate-600">Optional limitation, not an error: the owner you type is saved as text in the task. Assigning a real HubSpot owner needs an extra API permission this key deliberately lacks. It does not block creating follow-ups.</p>}
         <ul className="mt-3 space-y-2" data-testid="task-list">{openTasks.length === 0 && <li className="text-sm text-slate-600">No open follow-ups.</li>}
           {openTasks.map((t: any) => <li key={t.id} className="rounded border border-slate-300 p-2 text-sm" data-testid="task">
             <div className="flex flex-wrap items-center gap-2"><b>{t.subject}</b> <span>due {t.due_on}</span> <span className="text-slate-600">owner {t.owner}</span>
               {t.overdue && <Pill tone="red">overdue</Pill>}
-              {t.op_state === "created" ? <Pill tone="green">saved in HubSpot · {t.hubspot_status ?? "status unavailable"}</Pill> : <Pill tone="amber">not saved to HubSpot ({t.op_state})</Pill>}</div>
+              {t.op_state === "created" ? <Pill tone="green">{DEMO ? "saved to simulated CRM" : "saved in HubSpot"} · {t.hubspot_status ?? "status unavailable"}</Pill> : <Pill tone="amber">not saved to HubSpot ({t.op_state})</Pill>}</div>
             {t.op_state !== "created" ? <div className="mt-1"><p className="text-red-800">{t.last_error}</p><button className={ghost} onClick={async () => { setErr(null); const r = await api.createTask(id, { request_id: t.request_id, subject: t.subject, owner: t.owner, due_on: t.due_on }); if (!r.ok) setErr(r.data.error); load(); }}>Retry saving</button></div> : (
               <>{t.completion_pending ? (
                 <div className="mt-2 rounded border border-amber-400 bg-amber-50 p-2" data-testid="completion-pending" role="status">

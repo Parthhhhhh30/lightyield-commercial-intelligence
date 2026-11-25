@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "build:demo": "vite build -c vite.demo.config.ts",
     "typecheck": "tsc -p .",
     "dev:test": "node scripts/dev-test.mjs",
     "dev:preview": "node scripts/dev-preview.mjs",
@@ -13,7 +14,8 @@
     "test": "node test/evidence.test.mjs",
     "test:logic": "node test/logic.test.mjs",
     "test:regress": "node test/regress/run-all.mjs",
-    "test:ui-offline": "playwright test -c playwright.offline.config.ts"
+    "test:ui-offline": "playwright test -c playwright.offline.config.ts",
+    "test:demo": "playwright test -c playwright.demo.config.ts"
   },
   "dependencies": {
     "react": "^19.3.1",

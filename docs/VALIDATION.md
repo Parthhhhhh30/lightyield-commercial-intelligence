@@ -33,3 +33,18 @@ Comments and test labels that named real companies were replaced with generic wo
 - **HubSpot owner.** The task owner is stored as text, because owner lookup needs an extra HubSpot permission.
 - **Provider retention.** Search queries and AI prompts are handled under the providers' own terms.
 - **Readiness.** This is not a production-ready or security-reviewed service.
+
+## Public interactive demo
+
+The [public demo](https://lightyield-demo.lightyield-commercial-intelligence.workers.dev) is a static build tested separately. Earlier results above do not apply to it, and its results do not apply to the live integrations.
+
+Tested on 25 November 2026 with `npm run test:demo`, in Chromium at desktop (1366×900) and mobile (Pixel 7) sizes, locally and against the hosted URL in fresh, signed-out browser contexts. All 8 checks passed in each run:
+
+- The full visitor journey: review with a required correction basis, explicit unknowns, simulated sync and read-back, qualification with sources kept separate, a discovery call and fit decision, a follow-up created and completed, state kept after reload, then reset.
+- Follow-ups are blocked until the account is synced. Sync is blocked until crop, lighting and plans are reviewed.
+- Separate browser contexts do not share state.
+- No request leaves the demo's own origin. None goes to `/api` or `/auth`, and none uses a method other than GET. A `fetch` to the API or a provider host is blocked by the Content Security Policy. API paths on the host return no JSON and set no cookies. No browser console errors.
+
+The existing mocked-API interface tests (`npm run test:ui-offline`, 27 tests) still pass on the operational build.
+
+Demo limits: one fictional company. The extraction was written in advance, so the demo shows how claims are checked, not how well a model extracts them. Identity resolution, AI-suggested questions and recovery from failed CRM writes are not part of the demo.

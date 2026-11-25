@@ -2,6 +2,10 @@
 
 LightYield researches UK glasshouse growers by name and records what their own websites say about crops and supplementary lighting. A person reviews that evidence, qualifies the account and manages discovery questions, a HubSpot record and a tracked follow-up.
 
+**[Live interactive demo](https://lightyield-demo.lightyield-commercial-intelligence.workers.dev)** — no sign-in or installation needed. Review the research on a fictional grower, sync it, record a discovery call, make the fit decision and complete a follow-up.
+
+> The public demo uses one fictional company, Fernbrook Glasshouses. Its research and CRM integrations are **simulated**: there is no live web search, AI model or HubSpot connection, and your changes stay in your own browser. The evidence checks, review rules and qualification logic are LightYield's own code, running in the browser. The real integrations are described below and in [docs/VALIDATION.md](docs/VALIDATION.md).
+
 ![Account qualification: eight dimensions, each showing whether it comes from a public source, the customer or is still unknown](docs/images/account-qualification.png)
 
 ## Why it exists
@@ -47,6 +51,15 @@ Each mode starts through a launcher that refuses to run unless the database is l
 Preview mode writes local usage counters, but no company, finding or follow-up records, and cannot sync to HubSpot. Search queries and AI prompts remain subject to the providers' retention terms.
 
 Offline checks: `npm test`, `npm run test:logic`, `npm run test:regress`, and `npm run build && npm run test:ui-offline` (after `npx playwright install chromium`).
+
+## Public demo build
+
+The demo is a separate static build of the same React interface. `vite.demo.config.ts` replaces the HTTP client (`ui/src/api.ts`) with a browser-local adapter (`ui/src/demo/api.ts`) that calls the shared rules in `src/logic.js`. The build fails if the bundle contains an API route or provider host, and a Content Security Policy with `connect-src 'none'` stops the page making network requests. It is hosted as static assets only (`wrangler.demo.jsonc`: no Worker script, bindings or secrets). The operational build and `wrangler.toml` are unchanged.
+
+```sh
+npm run build:demo   # writes dist-demo/
+npm run test:demo    # browser acceptance on desktop and mobile; set DEMO_URL to test the hosted copy
+```
 
 ## Validation and limits
 
